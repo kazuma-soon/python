@@ -1,0 +1,50 @@
+- RUNTEQの `Rubyの問題を解く部屋` の問題を解く。
+- 自主的に進める（以下の進捗管理にて）。
+
+
+## atcoder進捗管理
+- ABC042
+- ABC043
+- ABC044
+- ABC045
+- ABC046
+- ABC047
+- ABC048
+- ABC049
+- ABC050
+- ABC051
+- ABC052
+- ABC053
+- ABC054
+- ABC055
+- ABC056
+
+**pythonへの切り替え**
+- ABC057 A
+- ABC058 A
+- ABC059 AB
+- ABC060 A
+- ABC061 AB
+- ABC062 AB
+- ABC063 AB
+- ABC064 AB
+- ABC065 A
+- ABC066 A
+- ABC067 ABC
+- ABC068 A
+- ABC069 AB
+- ABC070 AB
+- ABC071 AB
+- ABC072 AB
+- ABC073 AB
+- ABC074 A
+
+
+
+
+
+
+
+
+
+

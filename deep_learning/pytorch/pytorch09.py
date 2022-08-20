@@ -49,7 +49,8 @@ class WineDataset(Dataset):
 
 # create dataset
 dataset = WineDataset()
-
+print(dataset[2])
+breakpoint()
 # get first sample and unpack
 first_data: tuple = dataset[0]
 features, labels = first_data

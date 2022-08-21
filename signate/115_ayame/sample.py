@@ -1,4 +1,5 @@
 import pandas as pd
+import numpy as np
 import torch
 from torch.utils.data import Dataset, DataLoader
 import torch.nn as nn
@@ -88,4 +89,30 @@ for epoch in range(epochs):
 
     if (epoch + 1) % 1000 == 0:
         print('Epoch [%d/%d], Loss: %.4f' % (epoch + 1, epochs, loss.item()))
+
+with torch.no_grad():
+    df_test = pd.read_table('./test.tsv')
+    ids = torch.tensor(df_test.iloc[:, 0].astype(float).values.tolist(), dtype=torch.float32).reshape(-1, 1).numpy().astype(np.int).astype(np.unicode)
+    
+    _, _, test_x, _ = dataset[:]
+    outputs = torch.round(model(test_x)).numpy().astype(np.int).astype(np.unicode)
+    for i, output in enumerate(outputs):
+        if output == '1':
+            outputs[i] = 'Iris-setosa'
+        if output == '2':
+            outputs[i] = 'Iris-virginica'
+        if output == '3':
+            outputs[i] = 'Iris-versicolor'
+
+    ans_data = np.concatenate([ids, outputs], axis=1)
+    np.savetxt('./ans.csv', ans_data, delimiter=',', fmt="%s")
+
+    
+
+# x_test, y_testの順番がバラバラなため、accuracyが求められない。
+# with torch.no_grad():
+#     _, _, x_test, y_test = dataset[:]
+#     y_pred = torch.round(model(x_test))
+#     acc = y_pred.eq(y_test).sum() / len(dataset)
+#     print(f'accuracy: {acc.item():.4f}')
 

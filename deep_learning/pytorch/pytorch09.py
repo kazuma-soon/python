@@ -31,7 +31,7 @@ class WineDataset(Dataset):
     def __init__(self):
         # Initialize data, download, etc.
         # read with numpy or pandas
-        xy = np.loadtxt('./data/wine/wine.csv', delimiter=',', dtype=np.float32, skiprows=1)
+        xy = np.loadtxt('./data/wine.csv', delimiter=',', dtype=np.float32, skiprows=1)
         self.n_samples = xy.shape[0]
 
         # here the first column is the class label, the rest are the features
@@ -50,7 +50,6 @@ class WineDataset(Dataset):
 # create dataset
 dataset = WineDataset()
 print(dataset[2])
-breakpoint()
 # get first sample and unpack
 first_data: tuple = dataset[0]
 features, labels = first_data
@@ -73,6 +72,7 @@ dataiter = iter(train_loader)
 data = dataiter.next()
 features, labels = data
 print(features, labels)
+breakpoint()
 
 # Dummy Training loop
 num_epochs = 2

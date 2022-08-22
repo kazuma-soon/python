@@ -1,4 +1,5 @@
 # ミニバッチの何がメリットなのか？SGD, Adamなどの使い分けは？
+# 正答率を上げる
 import pandas as pd
 import numpy as np
 import torch
@@ -43,10 +44,10 @@ hidden_size2 = 30
 output_size = 1
 model = LinearRegression(input_size, hidden_size1, hidden_size2, output_size)
 
-optimizer = torch.optim.Adam(params=model.parameters(), lr=0.01)
+optimizer = torch.optim.Adam(params=model.parameters(), lr=0.005)
 criterion = nn.MSELoss()
 
-epochs = 20000
+epochs = 50000
 for epoch in range(epochs):
     for data in dataloader:
         inputs, targets = data[:]

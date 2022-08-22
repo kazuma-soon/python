@@ -28,6 +28,7 @@ import torch.nn.functional as F
 
 class AyameDataset(Dataset):
     def __init__(self):
+        breakpoint()
         df_train = pd.read_table('./train.tsv')
         df_train_x = df_train.copy()
         df_train_y = df_train.copy()
@@ -103,7 +104,7 @@ with torch.no_grad():
             outputs[i] = 'Iris-virginica'
         if output == '3':
             outputs[i] = 'Iris-versicolor'
-
+    
     ans_data = np.concatenate([ids, outputs], axis=1)
     np.savetxt('./ans.csv', ans_data, delimiter=',', fmt="%s")
 

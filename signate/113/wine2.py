@@ -1,11 +1,10 @@
-# バッチを消すことで、精度が上がった。
-# ハイパーパラメーターを色々調整することで、下がった。
-# Adam -> Adadeltaを採用することで、loss関数が安定して下がるようになった。
-# しかし、実は精度が下がっているという。
+# モデルが十分にデータを再現できない。特徴量は全部必要？
 
-# 1. train, testに分割する
-# 2. accuracyを求める実装をする -> 精度が可視化され、確認しやすくなった。
-# 3. 正答率を上げるのに必死になるよりも、今後の実装力をつけるために行う
+# train自体のaccuracyを出してみて、高すぎるとカガクシュウ -> カガクシュウしている。
+# Epoch [149000/200000], Loss: 0.0075 self_accuracy: 1.0 accuracy: 0.8947368264198303
+
+# 特徴量同士の相関高いやつを片方？除く
+# Flavanoidsを除いてみる
 import pandas as pd
 import numpy as np
 import torch
@@ -17,10 +16,13 @@ import matplotlib.pyplot as plt
 
 class WineDataset(Dataset):
     def __init__(self, test_mode=None):
+        # 学習用：テスト用 = 70：19で分ける
         xy = np.loadtxt('train.tsv', skiprows=1)
-        self.train_x = torch.tensor(xy[:70, 2:], dtype=torch.float32, requires_grad=True)
+        np.random.shuffle(xy)
+        # xy = np.delete(arr=xy, obj=[7, 8, 13], axis=1)
+        self.train_x = torch.tensor(xy[:70, 2:], dtype=torch.float32)
         self.train_y = torch.tensor(xy[:70, 1], dtype=torch.float32).reshape(70, 1)
-        self.test_x = torch.tensor(xy[70:, 2:], dtype=torch.float32, requires_grad=True)
+        self.test_x = torch.tensor(xy[70:, 2:], dtype=torch.float32)
         self.test_y = torch.tensor(xy[70:, 1], dtype=torch.float32).reshape(19, 1)
         self.sample_size = self.train_x.shape[0]
         self.test_mode = test_mode
@@ -55,7 +57,7 @@ hidden_size1 = 64
 hidden_size2 = 32
 output_size  = 1
 lr           = 0.01
-epochs       = 200000
+epochs       = 100000
 
 model = LinearRegression(input_size, hidden_size1, hidden_size2, output_size)
 optimizer = torch.optim.Adadelta(params=model.parameters(), lr=lr)
@@ -63,6 +65,22 @@ criterion = nn.MSELoss()
 
 plot_x = np.array([])
 plot_y = np.array([])
+
+
+# 正答率の計算
+def calc_accuracy(test_x, test_y):
+    test_outputs   = torch.round(model(test_x))
+    test_size = test_y.size()[0]
+    accuracy = float(sum(test_y == test_outputs) / test_size)
+    return accuracy
+
+
+# 過学習を検知するため、学習したデータ自体への正答率を計算する
+def calc_self_accuracy(train_x, train_y, outputs):
+    outputs = torch.round(outputs).to(torch.int)
+    train_size = train_y.size()[0]
+    self_accuracy = float(sum(train_y == outputs) / train_size)
+    return self_accuracy
 
 
 for epoch in range(epochs):
@@ -75,18 +93,18 @@ for epoch in range(epochs):
 
     optimizer.step()
 
+    # lossの推移をプロットするため、x軸をエポックのリスト, y軸をlossのリストとして作成する
     plot_x = np.append(plot_x, epoch)
     plot_y = np.append(plot_y, loss.detach().numpy())
 
     if (epoch + 1) % 500 == 0 or epoch == 1:
+        self_accuracy = calc_self_accuracy(inputs, targets, outputs)
+
         test_dataset = WineDataset(test_mode=True)
         test_x, test_y = test_dataset[:]
-        test_outputs   = torch.round(model(test_x))
-        test_size = test_y.size()[0]
+        accuracy = calc_accuracy(test_x, test_y)
 
-        accuracy = float(sum(test_y == test_outputs) / test_size)
-
-        print('Epoch [%d/%d], Loss: %.4f' % (epoch + 1, epochs, loss.item()), f'accuracy: {accuracy}')
+        print('Epoch [%d/%d], Loss: %.4f' % (epoch + 1, epochs, loss.item()), f'self_accuracy: {self_accuracy}', f'accuracy: {accuracy}')
         
 
 
@@ -98,6 +116,7 @@ with torch.no_grad():
     plt.show()
 
 
+# 回答作成のため、ans.csvにid, classを書き込む
 with torch.no_grad():
     test_data = np.loadtxt('test.tsv', skiprows=1)
     ids       = torch.tensor(test_data[:, 0], dtype=torch.int).reshape(89, 1)

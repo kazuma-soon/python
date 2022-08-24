@@ -5,6 +5,10 @@
 
 # 特徴量同士の相関高いやつを片方？除く
 # Flavanoidsを除いてみる
+
+# 解決
+# 学習用データをシャッフルしていなかった。
+# そのため、過学習が発生・汎用的な最適値を出せなかった。
 import pandas as pd
 import numpy as np
 import torch

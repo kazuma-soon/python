@@ -1,5 +1,9 @@
-# accuracyを重ねtグラフ表示する
-# 
+# 疲れたので一旦放置
+
+# 新しくやったこと
+# - グラフを重ねて複数表示
+# - バッチを導入
+
 import torch
 from torch.utils.data import Dataset, DataLoader
 import torchvision.datasets as datasets
@@ -55,18 +59,20 @@ class LinearRegression(nn.Module):
         self.linear2 = nn.Linear(hidden_size, output_size)
 
     def forward(self, x):
-        x = torch.sigmoid(self.linear1(x))
+        x = self.linear1(x)
+        x = torch.sigmoid(x)
         x = self.linear2(x)
+        x = F.softmax(input=x, dim=1)
         return x
 
 
 # parameters
-input_size  = 784
-hidden_size = 64
-output_size = 1
+input_size  = 28*28
+hidden_size = 128
+output_size = 10   # -> ここって1でいいの？0 ~ 9の10では？ソフトマックス使うのなら。
 batch_size  = 410
 lr          = 0.01
-epochs      = 1000
+epochs      = 500
 
 # for making graphs
 epoch_x    = np.array([])
@@ -85,6 +91,7 @@ def calc_accuracy(test_x, test_y):
     test_outputs = torch.round(model(test_x))
     test_size = test_x.size()[0]
     accuracy = float(sum(test_outputs == test_y) / test_size)
+    accuracy = round(accuracy, 3)
     return accuracy
 
 
@@ -101,21 +108,32 @@ for epoch in range(epochs):
     if (epoch + 1) % 5 == 0 or epoch == 1:
         test_dataset = DigitTestDataset()
         test_x, test_y = test_dataset[:]
-
+        breakpoint()
         accuracy = calc_accuracy(test_x, test_y)
         print('Epoch [%d/%d], Loss: %.4f' % (epoch + 1, epochs, loss.item()), f'accuracy: {accuracy}')
-
-        np.append(epoch_x,    epoch)
-        np.append(loss_y,     loss.detach().numpy())
-        np.append(accuracy_y, accuracy)
+        epoch_x    = np.append(epoch_x,    epoch)
+        loss_y     = np.append(loss_y,     loss.detach().numpy())
+        accuracy_y = np.append(accuracy_y, accuracy)
 
 
 with torch.no_grad():
-    plt.xlabel('epoch')
-    plt.ylabel('loss')
-    plt.xlim(0.0, epochs)
-    plt.ylim(0.0, 1.0)
-    plt.plot(epoch_x, loss_y)
+    epoch_x    = epoch_x.reshape(-1, 1)
+    loss_y     = loss_y.reshape(-1, 1)
+    accuracy_y = accuracy_y.reshape(-1, 1)
+
+    fig, ax = plt.subplots()
+    x = epoch_x
+    c1,c2 = "red", "blue"   # 各プロットの色
+    l1,l2 = "loss","accuracy"  # 各ラベル
+
+    ax.set_xlabel('epoch')  # x軸ラベル
+    ax.set_ylabel('y')      # y軸ラベル
+    ax.set_xlim([0, epochs])
+    ax.set_ylim([0, 1])
+
+    ax.plot(x, loss_y,     color=c1, label=l1)
+    ax.plot(x, accuracy_y, color=c2, label=l2)
+    ax.legend(loc=0)
     plt.show()
         
     

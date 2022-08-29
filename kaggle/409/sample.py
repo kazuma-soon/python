@@ -12,8 +12,6 @@ class StockDataset(Dataset):
         x_data = pd.read_csv('./train.csv', usecols=['Date', 'Open', 'High', 'Low', 'Close'])
         y_data = pd.read_csv('./train.csv', usecols=['Up'])
         
-        
-
     def __getitem__(self, index):
         return list(self.x_data.iloc[index]), list(self.y_data.iloc[index])
 

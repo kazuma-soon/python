@@ -4,6 +4,7 @@
 # 株価が下がった時のみ購入する。
 
 
+
 import numpy  as np
 import pandas as pd
 import utils
@@ -20,7 +21,7 @@ def down_plan(init_invest=50000, continuous_investment=4000, budget=480000, n=12
         investment *= monthly_interest
 
         if monthly_interest < 1:
-            add_investment = continuous_investment * 10
+            add_investment = continuous_investment * 3
             if budget >= add_investment:
                 investment += add_investment
                 principal  += add_investment
@@ -35,7 +36,7 @@ def down_plan(init_invest=50000, continuous_investment=4000, budget=480000, n=12
     investment = round(investment, 2)
     principal  = round(principal, 2)
     profits    = round(investment / principal, 2)
-    print('---basic_plan---')
+    print('---down_plan---')
     print(f'{investment = }')
     print(f'{principal  = }')
     print(f'return     = {profits}')

@@ -54,4 +54,3 @@ def gbm(first_price=100, expected_return=0.05, sigma=0.18, span=10.0, n=121) -> 
     gbm_ndarray = first_price * np.exp(trend + nonsense)
     return gbm_ndarray
 
-

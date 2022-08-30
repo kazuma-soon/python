@@ -9,7 +9,7 @@ import pandas as pd
 import utils
 
 
-def basic_plan(init_invest=50000, continuous_investment=4000, n=120, data_y=utils.gbm()):
+def basic_plan(init_invest=50000, continuous_investment=4000, budget=530000, n=120, data_y=utils.gbm()):
     investment  = init_invest
     principal   = init_invest
     investment_data_for_plot = np.array([])
@@ -18,8 +18,17 @@ def basic_plan(init_invest=50000, continuous_investment=4000, n=120, data_y=util
     for t in range(n):
         monthly_interest = (data_y[t+1] - data_y[t]) / data_y[t] + 1
         investment *= monthly_interest
-        investment += continuous_investment
-        principal  += continuous_investment
+
+        if budget >= continuous_investment:
+            investment += continuous_investment
+            principal  += continuous_investment
+            budget -= continuous_investment
+
+        if budget < continuous_investment:
+            investment += budget
+            principal  += budget
+            budget = 0
+
         investment_data_for_plot, principal_data_for_plot = create_basic_plan_data_for_plot(investment_data_for_plot, principal_data_for_plot, investment, principal)
 
     investment = round(investment, 2)
@@ -37,5 +46,3 @@ def create_basic_plan_data_for_plot(investment_data_for_plot, principal_data_for
     investment_data_for_plot = np.append(investment_data_for_plot, investment)
     principal_data_for_plot  = np.append(principal_data_for_plot,  principal)
     return investment_data_for_plot, principal_data_for_plot
-
-basic_plan()

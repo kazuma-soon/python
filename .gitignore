@@ -1,5 +1,14 @@
 cpython
+deepjazz
+
 .DS_Store
 __pycache__
 
+*.sv
+*.tsv
+*.png
+*.jpg
+*.txt
+*.wav
+*.pickle
 *csv

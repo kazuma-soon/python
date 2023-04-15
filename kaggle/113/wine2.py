@@ -16,6 +16,8 @@ from torch.utils.data import Dataset, DataLoader
 import torch.nn as nn
 import torch.nn.functional as F
 import matplotlib.pyplot as plt
+import os
+os.chdir('/Users/kazuma/Documents/menew/my_python/kaggle/113')
 
 
 class WineDataset(Dataset):
